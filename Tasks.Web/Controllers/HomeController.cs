@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Tasks.Web.Models;
 using Tasks.Data;
 using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Tasks.Web.Controllers
 {
@@ -17,26 +18,30 @@ namespace Tasks.Web.Controllers
         {
             _connectionString = configuration.GetConnectionString("ConStr");
         }
+
+        [Authorize]
         public IActionResult Index()
         {
+
+            var authDb = new UserRepository(_connectionString);
+            var user = authDb.GetIdForEmail(User.Identity.Name);
+
             var repo = new TaskRepository(_connectionString);
-           var a= repo.GetOpenAssignments();
+            var a = repo.GetOpenAssignments();
             return View(a);
         }
 
-        public IActionResult AddTask()
-        {
-            return View();
-        }
-
+        [HttpPost]
         public IActionResult AddTask(string name)
         {
-            
-
-            return View();
+            var a = new Assignment { Name = name, Status = Status.Incomplete };
+            var repo = new TaskRepository(_connectionString);
+            repo.AddAssignment(a);
+            return Redirect("/home/index");
         }
 
 
-        
+
+
     }
 }
