@@ -1,7 +1,6 @@
 ﻿$(() => {
     const connection = new signalR.HubConnectionBuilder()
         .withUrl("/TaskHub").build();
-    console.log("hello");
     connection.start();
 
     var Status = {
@@ -11,31 +10,31 @@
 
     };
 
-    $(".set-inprocess").on('click', function() {
+    $("#task-table").on('click','.set-inprocess', function () {
         const taskId = $(this).data("id");
         const status = "Inprocess";
         connection.invoke("UpdateAssignment", taskId, Status.Inprocess );
     });
 
-    $(".set-complete").on('click', function(){
+    $("#task-table").on('click','.set-complete', function(){
         const taskId = $(this).data("id");
         const status = "Complete";
         connection.invoke("UpdateAssignment", taskId, Status.Complete );
-        console.log(Status.Complete);
     });
 
    
 
     connection.on("TasksUpdate", tasks => {
+        console.log(tasks);
         fillTable(tasks);
     });
 
     const addTaskToTable = task => {
-        console.log(task.Status)
+        console.log(task.id);
         $("#task-table").append(`<tr>
-                                        <td>${task.Name}</td>
-                                        <td>${task.Status}</td><td>`+
-                                        (task.Status = 0 ? `<button class="btn btn-primary set-inprocess" data-id="${task.Id}">Incomplete</button>` : `<button class="btn btn-primary set-complete" data-id="${task.Id}">Being worked on by ${task.UserName}</button>`)
+                                        <td>${task.name}</td>
+                                        <td>`+
+                                        (task.status === 0 ? `<button class="btn btn-primary set-inprocess" data-id="${task.Id}">Incomplete</button>` : `<button class="btn btn-primary set-complete" data-id="${task.id}">Being worked on by ${task.userName}</button>`)
                                             
                                         + '</td></tr>');
     }
